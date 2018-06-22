@@ -28,12 +28,41 @@ var readFiles = function(paths, cb) {
     });
 }
 
+var appendClass = function(clsName, cls, fl) {
+	var styles = cls.declarations
+					.map(dec=> dec.property+':'+dec.value)
+					.reduce((a,b) => a+'; '+ b);
+	return fl = fl+'\n'+clsName+'{\n '+styles.replace(/ /g,'\n ')+'\n}';
+}
+
 var iterate = function(htmlTags, cssRules, level){
 	const s = '  ';
 	htmlTags.forEach(tag => {
 		
 		console.log(s.repeat(level),tag.name);
 		if(tag.attribs){
+			
+			let startingBlock = false;
+			
+			let classes = tag.attribs.class;
+			if(classes){
+				
+				startingBlock = classes.includes('my-section');
+				cssFile = '';
+				
+				classes
+				.split(' ')
+				.forEach(cls=>{
+					cls = '.'+cls;
+					const matchedClass = cssRules.find(value=>{
+						return value.selectors.includes(cls);
+					});
+					
+					if(matchedClass && startingBlock){
+						console.log(appendClass(cls, matchedClass, cssFile));
+					}
+				});
+			}
 			
 			let id = tag.attribs.id;
 			if(id){
@@ -50,25 +79,6 @@ var iterate = function(htmlTags, cssRules, level){
 					console.log(s.repeat(level+1),id,'[',styles,']');
 				}
 				
-			}
-			
-			let classes = tag.attribs.class;
-			if(classes){
-				classes
-				.split(' ')
-				.forEach(cls=>{
-					cls = '.'+cls;
-					const matchedClass = cssRules.find(value=>{
-						return value.selectors.includes(cls);
-					});
-					
-					if(matchedClass){
-						var styles = matchedClass.declarations
-											.map(dec=> dec.property+':'+dec.value)
-											.reduce((a,b) => a+'; '+ b);
-						console.log(s.repeat(level+1),cls,'[',styles,']');
-					}
-				});
 			}
 		}
 		

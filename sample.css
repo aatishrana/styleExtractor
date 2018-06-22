@@ -4,8 +4,15 @@
 	margin-right:5px;
 }
 
+.my-section {
+	background-color:white;
+}
+
 .big-font, .b-font{
 	font-size:10px;
+	border-bottom:3px solid red;
+	padding-top:3px;
+	z-index:3;
 }
 
 .large-card{
