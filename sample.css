@@ -1,0 +1,18 @@
+#first-div{
+	color:black;
+	background-color:red;
+	margin-right:5px;
+}
+
+.big-font, .b-font{
+	font-size:10px;
+}
+
+.large-card{
+	height:500px;
+	width:100%;
+}
+
+.custom-link{
+	color:red;
+}
