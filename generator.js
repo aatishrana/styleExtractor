@@ -41,7 +41,7 @@ var iterate = function(tags,cssRules,level){
 					return value.selectors.includes(id);
 				});
 				
-				//if(data)
+				if(data)
 					console.log(' '.repeat(level+1),
 						id,
 						'[',
