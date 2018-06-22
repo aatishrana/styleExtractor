@@ -28,58 +28,52 @@ var readFiles = function(paths, cb) {
     });
 }
 
-var iterate = function(tags,cssRules,level){
-	tags.forEach(value => {
+var iterate = function(htmlTags, cssRules, level){
+	const s = '  ';
+	htmlTags.forEach(tag => {
 		
-		console.log("-".repeat(level),value.name);
-		if(value.attribs){
+		console.log(s.repeat(level),tag.name);
+		if(tag.attribs){
 			
-			let id = value.attribs.id;
+			let id = tag.attribs.id;
 			if(id){
 				id = '#'+id;
-				const data = cssRules.find(value=>{
+				const matchedId = cssRules.find(value=>{
 					return value.selectors.includes(id);
 				});
 				
-				if(data)
-					console.log(' '.repeat(level+1),
-						id,
-						'[',
-						data.declarations
-						.map(dec=> dec.property+':'+dec.value)
-						.reduce((a,b) => a+';'+ b),
-						']');
-				/*data.declarations.forEach(dec=>{
-					console.log(' '.repeat(level+1),id,'[',dec.property,':',dec.value,']');
-				});*/
+				if(matchedId){
+					var styles = matchedId.declarations
+										.map(dec=> dec.property+':'+dec.value)
+										.reduce((a,b) => a+'; '+ b);
+						
+					console.log(s.repeat(level+1),id,'[',styles,']');
+				}
 				
 			}
 			
-			let classes = value.attribs.class;
+			let classes = tag.attribs.class;
 			if(classes){
 				classes
 				.split(' ')
-				.forEach(cla=>{
-					cla = '.'+cla;
-					const data = cssRules.find(value=>{
-						return value.selectors.includes(cla);
+				.forEach(cls=>{
+					cls = '.'+cls;
+					const matchedClass = cssRules.find(value=>{
+						return value.selectors.includes(cls);
 					});
 					
-					if(data)
-					data.declarations.forEach(dec=>{
-						console.log(' '.repeat(level+1),cla,'[',dec.property,':',dec.value,']');
-					});
+					if(matchedClass){
+						var styles = matchedClass.declarations
+											.map(dec=> dec.property+':'+dec.value)
+											.reduce((a,b) => a+'; '+ b);
+						console.log(s.repeat(level+1),cls,'[',styles,']');
+					}
 				});
 			}
-			
-			
-			//console.log(" ".repeat(level),id, classes);
 		}
 		
-		
-		if(value.children &&value.children.length>0)
-			iterate(value.children.filter(tagFilter),
-		cssRules,++level);
+		if(tag.children &&tag.children.length>0)
+			iterate(tag.children.filter(tagFilter),cssRules,++level);
 	});
 }
 
@@ -87,8 +81,6 @@ var parsing = function(rawHtml, rawcss){
 	var handler = new htmlparser.DefaultHandler(function (error, dom) {
     if (error)
         console.log(error);
-    else
-        console.log('no error');
 	},
 		{ 
 		verbose: false, 
@@ -107,7 +99,7 @@ var parsing = function(rawHtml, rawcss){
 					.rules
 					.filter(ruleFilter);
 	
-	iterate(htmlTags, cssRules,0);
+	iterate(htmlTags, cssRules, 0);
 };
 
 readFiles(files, function (errors, data) {
